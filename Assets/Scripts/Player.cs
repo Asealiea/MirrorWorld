@@ -54,17 +54,7 @@ public class Player : MonoBehaviour
             _anim.SetBool("Jump", false);
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && _charControl.isGrounded && _velocity.z == 0)
-        {
-            _anim.SetBool("Jump",true);
-        }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift) && _charControl.isGrounded && Mathf.Abs(_velocity.z) > 0)
-        {
-            _roll = true;
-            _anim.SetBool("Roll",true);
-        }
-     
 
 
         if (_charControl.isGrounded && _charControl.enabled)
@@ -81,8 +71,18 @@ public class Player : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space)&& _velocity.z != 0)
             {
                 Jumping();
-
             }
+            else if (Input.GetKeyDown(KeyCode.Space) && _velocity.z == 0)
+            {
+                _anim.SetBool("Jump", true);
+            }
+
+            if (Input.GetKeyDown(KeyCode.LeftShift) && Mathf.Abs(_velocity.z) > 0)
+            {
+                _roll = true;
+                _anim.SetBool("Roll",true);
+            }
+     
         }
     }
 //    */
@@ -101,35 +101,11 @@ public class Player : MonoBehaviour
 
         if (_charControl.isGrounded && !_standingJump && !_roll)
         {
-            _yVelocity = 0;
-            /*
-            if (_jumping && _timer < 0)
-            {
-                _jumping = false;
-                _anim.SetBool("Jump", _jumping);
-                // StartCoroutine(JumpCoolDown());
-                _timer = 0.2f;
-            }
-            else
-            {
-                _timer -= Time.deltaTime;
-            }
-            */
+           
+
             _direction = new Vector3(0, 0, _hAxis);
             _velocity = _direction * _speed;
-            //my rotation methods
-            /*
-            if (_hAxis < -0.1f)
-            {
-                transform.rotation = Quaternion.Euler(0, 180, 0);
-            }
-            else if( _hAxis > 0.1f)
-            {
-                transform.rotation = Quaternion.Euler(0, 0, 0);
-            }
-            */
 
-            //jonathans methods for rotating
             if (_hAxis != 0)
             {
                 Vector3 facing = transform.localEulerAngles;
@@ -137,18 +113,7 @@ public class Player : MonoBehaviour
                 transform.localEulerAngles = facing;
             }
 
-
-
             _anim.SetFloat("Speed", Mathf.Abs(_hAxis));
-            /*  
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                _yVelocity = _jumpForce;
-
-                _jumping = true;
-                _anim.SetBool("Jump", _jumping);
-            } 
- //         */
         }
         else
         {
@@ -171,6 +136,7 @@ public class Player : MonoBehaviour
         _standingJump = state;
         //_anim.SetTrigger("Jumping");
         _anim.SetBool("Jump", state);
+        _yVelocity = 0;
     }
 
     public void GrabLedge(Transform Hands, Transform EndPos)

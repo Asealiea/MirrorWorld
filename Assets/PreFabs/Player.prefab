@@ -12,6 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ea3ab906b424674dbda152c63921035, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _ogCharConSize: 4
+  _ogCharConCenter: {x: 0, y: 1.94, z: 0}
+  _rollCharConSize: 2
+  _rollCharConCenter: {x: 0, y: 0.94, z: 0}
 --- !u!1 &1871872482059497838
 GameObject:
   m_ObjectHideFlags: 0
