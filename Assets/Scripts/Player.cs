@@ -1,164 +1,201 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
+    private CharacterController _charControl;
+    [SerializeField]  private float _speed = 9;
     [SerializeField] private float _gravity = 1;
-    [SerializeField] private float _speed = 5;
-    private Vector3 _velocity;
-    private Vector3 _direction;
-    private float _yVelocity;
-    private float _jumpForce = 20f;
-    private CharacterController _controller;
-    private float _hMovement;
-    private bool _doubleJump;
-    private int _coinCount;
-    [SerializeField] private int _lives = 3;
-    [SerializeField] private Transform _spawnPoint;
-    private bool _wallJump;
-    private Vector3 _wallDirection;
-    private float _pushPower = 3;
+    [SerializeField] private Vector3 _direction, _velocity;
+    [SerializeField] private float _jumpForce = 20;
+    [SerializeField] private float _yVelocity;
+    private Animator _anim;
+    private bool _jumping;
+    [SerializeField] private Vector3 _endPos;
+    private bool _onLedge;
+    private bool _standingJump;
+ 
 
 
+
+    
+    void Awake()
+    {
+#if UNITY_EDITOR
+        QualitySettings.vSyncCount = 0; // VSync must be disabled.
+        Application.targetFrameRate = 60;
+#endif
+    }
+    
+
+
+    // Start is called before the first frame update
     void Start()
     {
-
-        _controller = GetComponent<CharacterController>();
-        if (_controller == null)
+        _charControl = GetComponent<CharacterController>();
+        if (_charControl == null)
         {
-            Debug.LogError("Player:: Controller is null");
+            Debug.LogError("Player:: CharacterController is null");
         }
-        UIManager.Instance.UpdateLives(_lives);
+        _anim = GetComponentInChildren<Animator>();
+        if (_anim == null)
+        {
+            Debug.LogError("Player:: Animator is null");
+        }
     }
 
-
-    void Update()
+//    /*
+    private void Update()
     {
-        if (transform.position.y > -8f)
+        if (Input.GetKeyDown(KeyCode.E) && _onLedge)
         {
-            Movement();
+            _anim.SetTrigger("Climb");
+            _anim.SetBool("Jump", false);
         }
-        else
+
+        if (Input.GetKeyDown(KeyCode.Space) && _charControl.isGrounded && _velocity.z == 0)
         {
-            Respawn();
+            _anim.SetBool("Jump",true);
+
+            Debug.Log("Jump");
+
         }
-       
-    }
+     
+
+
+        if (_charControl.isGrounded && _charControl.enabled)
+        {
             
-    private void Movement()
+            if (_jumping)
+            {
+                _jumping = false;
+                _anim.SetBool("Jump", _jumping);
+                // StartCoroutine(JumpCoolDown());
+            
+            }            
+            
+            if (Input.GetKeyDown(KeyCode.Space)&& _velocity.z != 0)
+            {
+                Jumping();
+
+            }
+        }
+    }
+//    */
+    // Update is called once per frame
+    void FixedUpdate()
     {
-        _hMovement = Input.GetAxis("Horizontal");
-        if (_controller.isGrounded)
+        if (_charControl.enabled)
         {
-            _direction = new Vector3(_hMovement, 0, 0);
+            CharMovement();
+        }
+    }
+
+    private void CharMovement()
+    {
+        float _hAxis = Input.GetAxisRaw("Horizontal");
+
+        if (_charControl.isGrounded && !_standingJump)
+        {
+            _velocity = Vector3.zero;
+            /*
+            if (_jumping && _timer < 0)
+            {
+                _jumping = false;
+                _anim.SetBool("Jump", _jumping);
+                // StartCoroutine(JumpCoolDown());
+                _timer = 0.2f;
+            }
+            else
+            {
+                _timer -= Time.deltaTime;
+            }
+            */
+            _direction = new Vector3(0, 0, _hAxis);
             _velocity = _direction * _speed;
-            _wallJump = false;
+            //my rotation methods
+            /*
+            if (_hAxis < -0.1f)
+            {
+                transform.rotation = Quaternion.Euler(0, 180, 0);
+            }
+            else if( _hAxis > 0.1f)
+            {
+                transform.rotation = Quaternion.Euler(0, 0, 0);
+            }
+            */
+
+            //jonathans methods for rotating
+            if (_hAxis != 0)
+            {
+                Vector3 facing = transform.localEulerAngles;
+                facing.y = _direction.z > 0 ? 0 : 180; // if direction.z is greater then 0 = 0 else 180;
+                transform.localEulerAngles = facing;
+            }
+
+
+
+            _anim.SetFloat("Speed", Mathf.Abs(_hAxis));
+            /*  
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 _yVelocity = _jumpForce;
-                _doubleJump = true;
-            }
+
+                _jumping = true;
+                _anim.SetBool("Jump", _jumping);
+            } 
+ //         */
         }
         else
         {
-            if (Input.GetKeyDown(KeyCode.Space) )
-            {
-                if (_doubleJump && !_wallJump)
-                {
-                    _yVelocity += _jumpForce;
-                    _doubleJump = false;
-                }
-
-                if (_wallJump)
-                {
-                    _velocity = _wallDirection* _speed;
-                    _yVelocity = _jumpForce;
-                    _wallJump = false;
-                }
-            }
             _yVelocity -= _gravity;
         }
-
         _velocity.y = _yVelocity;
-        _controller.Move(_velocity * Time.deltaTime);
+        _charControl.Move(_velocity * Time.deltaTime);
     }
 
-    private void OnControllerColliderHit(ControllerColliderHit hit)
+    private void Jumping()
     {
-            //Debug.DrawRay(hit.point, hit.normal, Color.blue);
-        if (hit.transform.CompareTag("MoveableBox"))
-        {
-            Rigidbody rig = hit.collider.attachedRigidbody;
-
-            //checking for rigidbody
-            if (rig == null || rig.isKinematic)
-            {
-                return;
-            }
-
-            //stop pushing things below us
-            if (hit.moveDirection.y < -0.3f)
-            {
-                return;
-            }
-
-            Vector3 pushDirection = new Vector3(hit.moveDirection.x, 0, 0);
-
-            //box moving time
-            rig.velocity = pushDirection * _pushPower;
-        
-        }
-
-
-
-
-        if (!_controller.isGrounded && hit.transform.CompareTag("Wall"))
-        {
-            _wallJump = true;
-           _wallDirection = hit.normal;
-        }
+        _yVelocity = _jumpForce;
+        _jumping = true;
+        //_anim.SetTrigger("Jumping");
+        _anim.SetBool("Jump", _jumping);
     }
-        
-
-
-    public void UpdateCoinCount()
+    public void StandingJump(bool state)
     {
-        //update coin count
-        _coinCount++;
-        UIManager.Instance.UpdateCoins(_coinCount);
+ 
+        _standingJump = state;
+        //_anim.SetTrigger("Jumping");
+        _anim.SetBool("Jump", state);
     }
 
-    public void Checkpoint(Transform Checkpoint)
-    {
-        _spawnPoint = Checkpoint;
-    }
-
-    public void Respawn()
+    public void GrabLedge(Transform Hands, Transform EndPos)
     {
         _yVelocity = 0;
-        transform.position = _spawnPoint.position;
+        _charControl.enabled = false;
+       // _gravity = 0;
+        _anim.SetTrigger("Ledge");
+        _anim.SetFloat("Speed", 0f);
+        _endPos = EndPos.position;
+        //updatedate the pos.
+        transform.position = Hands.position;
+        _onLedge = true;
     }
 
-    public void UpdateLives()
+    public void AfterClimb()
     {
-
-        _lives--;
-        UIManager.Instance.UpdateLives(_lives);
-        if (_lives <1)
-        {
-            //need to add "using UnityEngine.SceneManagement;" for this part.
-            SceneManager.LoadScene(0);
-        }
+        transform.position = _endPos;
+        _charControl.enabled = true;
     }
 
-    public int CoinsCount()
+    IEnumerator JumpCoolDown()
     {
-        return _coinCount;
-    }
+        yield return new WaitForSeconds(0.15f);
+        _jumping = false;
+        _anim.SetBool("Jump", _jumping);
+        yield break;
+        
 
+    }
 }
-
-        /*
-        */
