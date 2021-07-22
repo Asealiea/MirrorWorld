@@ -15,7 +15,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Vector3 _endPos;
     private bool _onLedge;
     private bool _standingJump;
- 
+    private bool _roll;
 
 
 
@@ -57,9 +57,12 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && _charControl.isGrounded && _velocity.z == 0)
         {
             _anim.SetBool("Jump",true);
+        }
 
-            Debug.Log("Jump");
-
+        if (Input.GetKeyDown(KeyCode.LeftShift) && _charControl.isGrounded && Mathf.Abs(_velocity.z) > 0)
+        {
+            _roll = true;
+            _anim.SetBool("Roll",true);
         }
      
 
@@ -96,9 +99,9 @@ public class Player : MonoBehaviour
     {
         float _hAxis = Input.GetAxisRaw("Horizontal");
 
-        if (_charControl.isGrounded && !_standingJump)
+        if (_charControl.isGrounded && !_standingJump && !_roll)
         {
-            _velocity = Vector3.zero;
+            _yVelocity = 0;
             /*
             if (_jumping && _timer < 0)
             {
@@ -189,13 +192,20 @@ public class Player : MonoBehaviour
         _charControl.enabled = true;
     }
 
-    IEnumerator JumpCoolDown()
+    public void StartingRoll(Vector3 Center, float Height)
     {
-        yield return new WaitForSeconds(0.15f);
-        _jumping = false;
-        _anim.SetBool("Jump", _jumping);
-        yield break;
-        
-
+        _roll = true;
+        _charControl.center = Center;
+        _charControl.height = Height;
     }
+
+    public void AfterRoll(Vector3 Center, float Height)
+    {
+        _roll = false;
+        _anim.SetBool("Roll", false);
+        _charControl.center = Center;
+        _charControl.height = Height;
+    }
+
+ 
 }

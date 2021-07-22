@@ -6,6 +6,10 @@ public class PlayerAnimations : MonoBehaviour
 {
 
     private Player _player;
+    [SerializeField] private float _ogCharConSize;
+    [SerializeField] private Vector3 _ogCharConCenter;
+    [SerializeField] private float _rollCharConSize;
+    [SerializeField] private Vector3 _rollCharConCenter;
 
     private void Start()
     {
@@ -14,6 +18,7 @@ public class PlayerAnimations : MonoBehaviour
         {
             Debug.LogError("PlayerAnimations:: Player is null");
         }
+   
     }
 
     public void AfterClimb()
@@ -25,8 +30,26 @@ public class PlayerAnimations : MonoBehaviour
     {
         _player.StandingJump(true);
     }
+
     public void AfterStandingJump()
     {
         _player.StandingJump(false);
     }
+
+    public void StartRolling()
+    {
+        //change the char controller size and center 
+ 
+        _player.StartingRoll(_rollCharConCenter, _rollCharConSize);
+    }
+
+    public void AfterRoll()
+    {
+        //reset the char controller 
+
+        _player.AfterRoll(_ogCharConCenter, _ogCharConSize);
+
+    }
+
+
 }
