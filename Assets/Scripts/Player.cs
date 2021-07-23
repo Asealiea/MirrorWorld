@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class Player : MonoBehaviour
 {
@@ -23,10 +26,8 @@ public class Player : MonoBehaviour
     
     void Awake()
     {
-#if UNITY_EDITOR
-        QualitySettings.vSyncCount = 0; // VSync must be disabled.
+        QualitySettings.vSyncCount = 0; 
         Application.targetFrameRate = 60;
-#endif
     }
     
 
@@ -56,6 +57,16 @@ public class Player : MonoBehaviour
             _anim.SetBool("Jump", false);
         }
 
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+#if UNITY_EDITOR
+            EditorApplication.isPlaying = false; // makes it stop while in test play
+#else
+		    Application.Quit();// quits the game (only works after it's been built)
+#endif
+
+        }
+
 
 
 
@@ -69,7 +80,7 @@ public class Player : MonoBehaviour
             
             }            
             
-            if (Input.GetKeyDown(KeyCode.Space)&& _velocity.z != 0)
+            if (Input.GetKeyDown(KeyCode.Space)&& _velocity.z != 0 && !_roll)
             {
                 Jumping();
             }
