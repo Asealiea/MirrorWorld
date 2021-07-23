@@ -51,5 +51,10 @@ public class PlayerAnimations : MonoBehaviour
 
     }
 
+    public void Standing()
+    {
+        _player.Standing();
+    }
+
 
 }

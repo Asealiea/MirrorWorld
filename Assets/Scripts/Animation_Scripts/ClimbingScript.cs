@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ClimbingScript : StateMachineBehaviour
 {
-    private Player _player;
+  /*  private Player _player;
 
 
     private void Awake()
@@ -15,6 +15,8 @@ public class ClimbingScript : StateMachineBehaviour
             Debug.Log("ClimbingScript:: Player is null");
         }
     }
+    */
+
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     //{
@@ -30,7 +32,11 @@ public class ClimbingScript : StateMachineBehaviour
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        _player.AfterClimb();
+       Player _player =  animator.GetComponentInParent<Player>();
+        if (_player != null)
+        {
+            _player.AfterClimb();
+        }
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()

@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
     private bool _onLedge;
     private bool _standingJump;
     private bool _roll;
+    private int _coins;
 
 
 
@@ -33,6 +34,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        _coins = 0;
         _charControl = GetComponent<CharacterController>();
         if (_charControl == null)
         {
@@ -45,7 +47,7 @@ public class Player : MonoBehaviour
         }
     }
 
-//    /*
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.E) && _onLedge)
@@ -64,7 +66,6 @@ public class Player : MonoBehaviour
             {
                 _jumping = false;
                 _anim.SetBool("Jump", _jumping);
-                // StartCoroutine(JumpCoolDown());
             
             }            
             
@@ -85,7 +86,7 @@ public class Player : MonoBehaviour
      
         }
     }
-//    */
+
     // Update is called once per frame
     void FixedUpdate()
     {
@@ -127,9 +128,9 @@ public class Player : MonoBehaviour
     {
         _yVelocity = _jumpForce;
         _jumping = true;
-        //_anim.SetTrigger("Jumping");
         _anim.SetBool("Jump", _jumping);
     }
+        //_anim.SetTrigger("Jumping");
     public void StandingJump(bool state)
     {
  
@@ -155,6 +156,10 @@ public class Player : MonoBehaviour
     public void AfterClimb()
     {
         transform.position = _endPos;
+    }
+
+    public void Standing()
+    {
         _charControl.enabled = true;
     }
 
@@ -171,6 +176,12 @@ public class Player : MonoBehaviour
         _anim.SetBool("Roll", false);
         _charControl.center = Center;
         _charControl.height = Height;
+    }
+
+    public void UpdateCoins()
+    {
+        _coins++;
+        UIManager.Instance.UpdateUICoin(_coins);
     }
 
  
