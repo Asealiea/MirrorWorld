@@ -4,6 +4,7 @@ using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -20,6 +21,8 @@ public class Player : MonoBehaviour
     private bool _standingJump;
     private bool _roll;
     private int _coins;
+    private int _lives = 3;
+    [SerializeField] private Transform _ogPos;
 
 
 
@@ -193,6 +196,19 @@ public class Player : MonoBehaviour
     {
         _coins++;
         UIManager.Instance.UpdateUICoin(_coins);
+    }
+
+    public void UpdateLives()
+    {
+        _lives--;
+        _charControl.enabled = false;
+        transform.position = _ogPos.position;
+        UIManager.Instance.UpdateLives(_lives);
+        if (_lives < 1)
+        {
+            SceneManager.LoadScene(0);
+        }
+        _charControl.enabled = true;
     }
 
  

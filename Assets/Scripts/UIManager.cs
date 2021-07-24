@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class UIManager : MonoBehaviour
 {
     #region Singleton
@@ -24,11 +25,16 @@ public class UIManager : MonoBehaviour
     }
     #endregion
 
-    [SerializeField] private Text _coinText;
+    [SerializeField] private Text _coinText,_livesText;
 
     public void UpdateUICoin(int Coins)
     {
         _coinText.text = "Coins: " + Coins;
+    }
+
+    public void UpdateLives(int lives)
+    {
+        _livesText.text = "Lives: " + lives;
     }
 
 

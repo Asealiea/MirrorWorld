@@ -29,7 +29,7 @@ GameObject:
   - component: {fileID: 1871872482059497835}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -87,6 +87,7 @@ MonoBehaviour:
   _jumpForce: 20
   _yVelocity: 0
   _endPos: {x: 0, y: 0, z: 0}
+  _ogPos: {fileID: 0}
 --- !u!1 &1871872482201454666
 GameObject:
   m_ObjectHideFlags: 0
